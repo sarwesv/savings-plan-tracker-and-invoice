@@ -1110,14 +1110,28 @@
       }
 
       if (isSignUpMode) {
-        if (existingUser) {
+        // Always check Firestore for duplicate accounts (source of truth)
+        let alreadyExists = false;
+        if (firebaseDb && window.FirebaseSDK) {
+          try {
+            const checkDoc = await window.FirebaseSDK.getDoc(window.FirebaseSDK.doc(firebaseDb, "users", emailLower));
+            if (checkDoc && checkDoc.exists()) alreadyExists = true;
+          } catch (e) {
+            // Fall back to local check
+            alreadyExists = !!existingUser;
+          }
+        } else {
+          alreadyExists = !!existingUser;
+        }
+
+        if (alreadyExists) {
           showToast('An account already exists with this email address. Please switch to the "Sign In" tab.', 'danger');
           return;
         }
 
         if (firebaseAuth && window.FirebaseSDK) {
           try {
-            showToast('Creating account with Firebase...');
+            showToast('Creating account...');
             const userCred = await window.FirebaseSDK.createUserWithEmailAndPassword(firebaseAuth, email, password);
             const name = nameInput || email.split('@')[0];
             const user = {
@@ -1413,21 +1427,30 @@
           return;
         }
 
-        // RULE: Target recipient MUST be a registered user on SaveNest (check local & Cloud Firestore)
-        let isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
+        // RULE: Target recipient MUST be a registered user — always validate against Firestore as source of truth
+        let isRegistered = false;
 
-        if (!isRegistered && firebaseDb && window.FirebaseSDK) {
+        if (firebaseDb && window.FirebaseSDK) {
           try {
             const userDoc = await window.FirebaseSDK.getDoc(window.FirebaseSDK.doc(firebaseDb, "users", recipientLower));
             if (userDoc && userDoc.exists()) {
               isRegistered = true;
               const uData = userDoc.data();
-              State.users.push({ email: uData.email, name: uData.name || recipientLower.split('@')[0] });
-              State.saveUsers();
+              // Update local cache
+              const existingIdx = State.users.findIndex(u => u.email.toLowerCase() === recipientLower);
+              if (existingIdx === -1) {
+                State.users.push({ email: uData.email, name: uData.name || recipientLower.split('@')[0] });
+                State.saveUsers();
+              }
             }
           } catch (e) {
             console.log('Firestore user check note:', e);
+            // Fall back to local check if Firestore is unavailable
+            isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
           }
+        } else {
+          // No Firestore — fall back to local users list
+          isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
         }
 
         if (!isRegistered) {
