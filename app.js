@@ -78,6 +78,21 @@
     setCurrentUser(user) {
       this.currentUser = user;
       localStorage.setItem('savenest_active_email', user.email);
+
+      // Save/upsert user document to Cloud Firestore
+      if (firebaseDb && window.FirebaseSDK && user && user.email) {
+        try {
+          const userLower = user.email.toLowerCase();
+          window.FirebaseSDK.setDoc(window.FirebaseSDK.doc(firebaseDb, "users", userLower), {
+            email: userLower,
+            name: user.name || userLower.split('@')[0],
+            provider: user.provider || 'email',
+            registeredAt: new Date().toISOString()
+          }, { merge: true });
+        } catch (e) {
+          console.log('Firestore user sync note:', e);
+        }
+      }
     },
 
     clearCurrentUser() {
@@ -865,7 +880,7 @@
   function setupFirestoreRealtime() {
     if (!firebaseDb || !window.FirebaseSDK) return;
 
-    // Real-Time Requests Sync across all accounts
+    // 1. Real-Time Requests Sync across all accounts
     try {
       const requestsRef = window.FirebaseSDK.collection(firebaseDb, "requests");
       window.FirebaseSDK.onSnapshot(requestsRef, (snapshot) => {
@@ -880,7 +895,31 @@
         }
       });
     } catch (e) {
-      console.log('Firestore snapshot listener note:', e);
+      console.log('Firestore requests snapshot listener note:', e);
+    }
+
+    // 2. Real-Time Registered Users Sync across all devices
+    try {
+      const usersRef = window.FirebaseSDK.collection(firebaseDb, "users");
+      window.FirebaseSDK.onSnapshot(usersRef, (snapshot) => {
+        snapshot.forEach((docSnap) => {
+          const u = docSnap.data();
+          if (u && u.email) {
+            const lower = u.email.toLowerCase();
+            const existing = State.users.find(x => x.email.toLowerCase() === lower);
+            if (!existing) {
+              State.users.push({
+                email: u.email,
+                name: u.name || u.email.split('@')[0],
+                avatar: (u.name || u.email).charAt(0).toUpperCase()
+              });
+              State.saveUsers();
+            }
+          }
+        });
+      });
+    } catch (e) {
+      console.log('Firestore users snapshot listener note:', e);
     }
   }
 
@@ -1277,7 +1316,7 @@
     // 7. Request Money Form
     const requestMoneyForm = document.getElementById('requestMoneyForm');
     if (requestMoneyForm) {
-      requestMoneyForm.addEventListener('submit', (e) => {
+      requestMoneyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const recipientEmail = document.getElementById('reqRecipientEmail').value.trim();
         const amount = parseFloat(document.getElementById('reqAmount').value);
@@ -1296,8 +1335,23 @@
           return;
         }
 
-        // RULE: Target recipient MUST be a registered user on SaveNest
-        const isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
+        // RULE: Target recipient MUST be a registered user on SaveNest (check local & Cloud Firestore)
+        let isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
+
+        if (!isRegistered && firebaseDb && window.FirebaseSDK) {
+          try {
+            const userDoc = await window.FirebaseSDK.getDoc(window.FirebaseSDK.doc(firebaseDb, "users", recipientLower));
+            if (userDoc && userDoc.exists()) {
+              isRegistered = true;
+              const uData = userDoc.data();
+              State.users.push({ email: uData.email, name: uData.name || recipientLower.split('@')[0] });
+              State.saveUsers();
+            }
+          } catch (e) {
+            console.log('Firestore user check note:', e);
+          }
+        }
+
         if (!isRegistered) {
           showToast(`Cannot send request. No registered user account found for "${recipientEmail}". They must register an account on SaveNest first.`, 'danger');
           return;
