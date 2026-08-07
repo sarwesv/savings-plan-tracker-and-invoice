@@ -133,7 +133,7 @@
       <div class="divider-text">or sign in with email</div>
 
       <!-- Auth Mode Toggle Tabs -->
-      <div style="display: flex; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.25rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; background: var(--bg-surface-inset); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.25rem; margin-bottom: 1.25rem;">
         <button id="authTabSignIn" type="button" class="btn" style="flex: 1; padding: 0.45rem; font-size: 0.85rem; background: rgba(16, 185, 129, 0.2); color: var(--accent-primary); border-radius: var(--radius-sm);">
           🔑 Email Sign In
         </button>
@@ -431,7 +431,7 @@
             <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">Account & Security Notifications</h3>
             <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Simulate real-time inbox security codes directly in your app browser session.</p>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
               <div>
                 <div style="font-weight: 600; font-size: 0.88rem;">Show In-App Security Inbox Banner</div>
                 <div style="font-size: 0.78rem; color: var(--text-muted);">Displays instant 6-digit deletion codes right on screen</div>
@@ -484,19 +484,19 @@
 
           <!-- Top Analytics Stats Cards -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
               <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Overall Target Completion</div>
               <div id="analyticsCompletionPct" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-primary); margin: 0.3rem 0;">0%</div>
               <div class="progress-track" style="height: 6px; margin-top: 0.5rem;"><div id="analyticsPortfolioBar" class="progress-fill" style="width: 0%;"></div></div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
               <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Remaining Goal</div>
               <div id="analyticsRemainingAmount" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-blue); margin: 0.3rem 0;">$0.00</div>
               <div style="font-size: 0.76rem; color: var(--text-subtle);">Needed to hit 100% target across all plans</div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
               <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Completed Goals 🎉</div>
               <div id="analyticsCompletedCount" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-amber); margin: 0.3rem 0;">0</div>
               <div style="font-size: 0.76rem; color: var(--text-subtle);">Plans that reached 100% goal</div>
@@ -505,7 +505,7 @@
 
           <!-- Category Breakdown Chart & Leaderboard Grid -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
+            <div style="background: var(--bg-surface-inset); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
               <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span class="material-symbols-rounded" style="color: var(--accent-purple);">pie_chart</span>
                 Category Allocation Breakdown
@@ -513,7 +513,7 @@
               <div id="categoryBreakdownContainer" style="display: flex; flex-direction: column; gap: 0.85rem;"></div>
             </div>
 
-            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
+            <div style="background: var(--bg-surface-inset); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
               <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span class="material-symbols-rounded" style="color: var(--accent-amber);">leaderboard</span>
                 Goal Completion Leaderboard

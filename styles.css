@@ -12,7 +12,7 @@
   --accent-primary: #10b981;
   --accent-primary-hover: #059669;
   --accent-glow: rgba(16, 185, 129, 0.3);
-  
+
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
   --accent-amber: #f59e0b;
@@ -44,6 +44,29 @@
 
   --font-family: 'Outfit', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Component-level tokens */
+  --bg-header: rgba(15, 23, 42, 0.85);
+  --bg-modal: #1e293b;
+  --bg-request-card: rgba(30, 41, 59, 0.5);
+  --bg-request-reason: rgba(15, 23, 42, 0.4);
+  --bg-toast: #1e293b;
+  --bg-bottom-nav: rgba(15, 23, 42, 0.95);
+  --bg-progress-track: rgba(255, 255, 255, 0.1);
+  --bg-surface-subtle: rgba(255, 255, 255, 0.03);
+  --bg-surface-inset: rgba(15, 23, 42, 0.4);
+  --btn-secondary-bg: rgba(255, 255, 255, 0.08);
+  --btn-secondary-bg-hover: rgba(255, 255, 255, 0.15);
+  --btn-secondary-border-hover: rgba(255, 255, 255, 0.25);
+  --tab-hover-bg: rgba(255, 255, 255, 0.05);
+  --user-badge-bg: rgba(255, 255, 255, 0.05);
+  --user-badge-bg-hover: rgba(255, 255, 255, 0.1);
+  --icon-btn-hover-bg: rgba(255, 255, 255, 0.1);
+  --pill-btn-bg: rgba(255, 255, 255, 0.06);
+  --pill-btn-bg-hover: rgba(255, 255, 255, 0.12);
+  --message-quote-color: #93c5fd;
+  --scrollbar-thumb: #334155;
+  --disclaimer-color: #fcd34d;
 }
 
 [data-theme="light"] {
@@ -61,6 +84,28 @@
 
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 20px -5px rgba(0, 0, 0, 0.12);
+
+  --bg-header: rgba(255, 255, 255, 0.9);
+  --bg-modal: #ffffff;
+  --bg-request-card: rgba(241, 245, 249, 0.8);
+  --bg-request-reason: rgba(226, 232, 240, 0.6);
+  --bg-toast: #1e293b;
+  --bg-bottom-nav: rgba(255, 255, 255, 0.95);
+  --bg-progress-track: rgba(0, 0, 0, 0.08);
+  --bg-surface-subtle: rgba(0, 0, 0, 0.02);
+  --bg-surface-inset: rgba(226, 232, 240, 0.5);
+  --btn-secondary-bg: rgba(0, 0, 0, 0.05);
+  --btn-secondary-bg-hover: rgba(0, 0, 0, 0.1);
+  --btn-secondary-border-hover: rgba(0, 0, 0, 0.2);
+  --tab-hover-bg: rgba(0, 0, 0, 0.05);
+  --user-badge-bg: rgba(0, 0, 0, 0.04);
+  --user-badge-bg-hover: rgba(0, 0, 0, 0.08);
+  --icon-btn-hover-bg: rgba(0, 0, 0, 0.07);
+  --pill-btn-bg: rgba(0, 0, 0, 0.05);
+  --pill-btn-bg-hover: rgba(0, 0, 0, 0.1);
+  --message-quote-color: #1d4ed8;
+  --scrollbar-thumb: #cbd5e1;
+  --disclaimer-color: #92400e;
 }
 
 [data-theme="light"] body {
@@ -93,7 +138,7 @@ body {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -134,7 +179,7 @@ body {
   padding: 0.6rem 1rem;
   font-size: 0.85rem;
   text-align: center;
-  color: #fcd34d;
+  color: var(--disclaimer-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,7 +195,7 @@ body {
 /* Header & Nav */
 header {
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--bg-header);
   backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
@@ -197,7 +242,7 @@ header {
   align-items: center;
   gap: 0.6rem;
   padding: 0.4rem 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--user-badge-bg);
   border: 1px solid var(--border-color);
   border-radius: 999px;
   cursor: pointer;
@@ -205,7 +250,7 @@ header {
 }
 
 .user-badge:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--user-badge-bg-hover);
   border-color: var(--accent-primary);
 }
 
@@ -281,7 +326,7 @@ header {
 
 .tab-btn:hover {
   color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--tab-hover-bg);
 }
 
 .tab-btn.active {
@@ -327,14 +372,14 @@ header {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--btn-secondary-bg);
   color: var(--text-main);
   border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--btn-secondary-bg-hover);
+  border-color: var(--btn-secondary-border-hover);
 }
 
 .btn-danger {
@@ -449,7 +494,7 @@ header {
 
 .icon-btn:hover {
   color: var(--text-main);
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--icon-btn-hover-bg);
 }
 
 .plan-title {
@@ -485,7 +530,7 @@ header {
 .progress-bar-bg {
   width: 100%;
   height: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-progress-track);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 1rem;
@@ -531,7 +576,7 @@ header {
 .modal-content {
   width: 100%;
   max-width: 480px;
-  background: #1e293b;
+  background: var(--bg-modal);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -601,7 +646,7 @@ header {
 }
 
 .pill-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--pill-btn-bg);
   border: 1px solid var(--border-color);
   color: var(--text-muted);
   padding: 0.35rem 0.7rem;
@@ -612,7 +657,7 @@ header {
 }
 
 .pill-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--pill-btn-bg-hover);
   color: var(--text-main);
 }
 
@@ -627,7 +672,7 @@ header {
   padding: 1.25rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  background: rgba(30, 41, 59, 0.5);
+  background: var(--bg-request-card);
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -663,7 +708,7 @@ header {
 }
 
 .request-reason {
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--bg-request-reason);
   padding: 0.6rem 0.8rem;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
@@ -677,7 +722,7 @@ header {
   padding: 0.6rem 0.8rem;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  color: #93c5fd;
+  color: var(--message-quote-color);
   font-style: italic;
 }
 
@@ -760,7 +805,7 @@ header {
 }
 
 .toast {
-  background: #1e293b;
+  background: var(--bg-toast);
   border: 1px solid var(--accent-primary);
   color: white;
   padding: 0.75rem 1.25rem;
@@ -867,7 +912,7 @@ header {
   left: 0;
   right: 0;
   height: 68px;
-  background: rgba(15, 23, 42, 0.95);
+  background: var(--bg-bottom-nav);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-color);
