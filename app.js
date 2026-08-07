@@ -1254,35 +1254,46 @@
     if (!splashEl) return;
     splashInitialized = true;
 
-    if (window.gsap) {
-      const tl = gsap.timeline();
+    function hideSplash() {
+      if (!splashEl) return;
+      splashEl.classList.add('hidden');
+      splashEl.style.display = 'none';
+      splashEl.style.pointerEvents = 'none';
+    }
 
-      // Entrance Animations (0.7s)
-      tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.7, ease: 'back.out(1.8)' })
-        .from('#splashTitle', { y: 20, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.3')
-        .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.35, ease: 'power2.out' }, '-=0.2')
-        
-        // Stage 1 Loading: Engine Initialization
-        .to('#splashProgressBar', { width: '40%', duration: 0.85, ease: 'power1.out', onComplete: () => {
-            if (statusEl) statusEl.textContent = 'Syncing Cloud Vault...';
-        }})
-        // Stage 2 Loading: Syncing Cloud Vault
-        .to('#splashProgressBar', { width: '80%', duration: 0.95, ease: 'power2.inOut', onComplete: () => {
-            if (statusEl) statusEl.textContent = 'Preparing Workspace...';
-        }})
-        // Stage 3 Loading: Complete
-        .to('#splashProgressBar', { width: '100%', duration: 0.5, ease: 'power1.in', onComplete: () => {
-            if (statusEl) statusEl.textContent = 'Ready!';
-        }})
-        
-        // Fade Out & Scale Entrance to Main App (0.5s)
-        .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: () => {
-            splashEl.style.display = 'none';
-        }}, '+=0.2');
+    // Unconditional safety fallback timer (3.2 seconds max)
+    setTimeout(hideSplash, 3200);
+
+    if (window.gsap) {
+      try {
+        const tl = gsap.timeline();
+
+        // Entrance Animations (0.7s)
+        tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.7, ease: 'back.out(1.8)' })
+          .from('#splashTitle', { y: 20, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.3')
+          .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.35, ease: 'power2.out' }, '-=0.2')
+          
+          // Stage 1 Loading: Engine Initialization
+          .to('#splashProgressBar', { width: '40%', duration: 0.85, ease: 'power1.out', onComplete: () => {
+              if (statusEl) statusEl.textContent = 'Syncing Cloud Vault...';
+          }})
+          // Stage 2 Loading: Syncing Cloud Vault
+          .to('#splashProgressBar', { width: '80%', duration: 0.95, ease: 'power2.inOut', onComplete: () => {
+              if (statusEl) statusEl.textContent = 'Preparing Workspace...';
+          }})
+          // Stage 3 Loading: Complete
+          .to('#splashProgressBar', { width: '100%', duration: 0.5, ease: 'power1.in', onComplete: () => {
+              if (statusEl) statusEl.textContent = 'Ready!';
+          }})
+          
+          // Fade Out & Scale Entrance to Main App (0.5s)
+          .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: hideSplash }, '+=0.2');
+      } catch (e) {
+        console.error('GSAP splash animation error:', e);
+        setTimeout(hideSplash, 1500);
+      }
     } else {
-      setTimeout(() => {
-        splashEl.style.display = 'none';
-      }, 3000);
+      setTimeout(hideSplash, 2500);
     }
   }
 

@@ -926,6 +926,13 @@ header {
   align-items: center;
   justify-content: center;
   text-align: center;
+  transition: opacity 0.5s ease;
+}
+
+.splash-overlay.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .splash-content {
