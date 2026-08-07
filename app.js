@@ -1181,7 +1181,9 @@
           } catch (err) {
             console.error('Firebase signIn error:', err);
             if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-              showToast('No account found with these credentials. Please check your email or click "Create Account".', 'danger');
+              showToast('Incorrect email or password. Please try again.', 'danger');
+            } else if (err.code === 'auth/too-many-requests') {
+              showToast('Too many failed attempts. Please wait a moment and try again.', 'danger');
             } else {
               showToast(`Sign in error: ${err.message}`, 'danger');
             }
@@ -1233,7 +1235,14 @@
     // 2. Sign Out
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) {
-      signOutBtn.addEventListener('click', () => {
+      signOutBtn.addEventListener('click', async () => {
+        if (firebaseAuth && window.FirebaseSDK) {
+          try {
+            await window.FirebaseSDK.signOut(firebaseAuth);
+          } catch (e) {
+            console.log('Firebase sign out note:', e);
+          }
+        }
         State.clearCurrentUser();
         showToast('Signed out successfully');
         renderApp();
