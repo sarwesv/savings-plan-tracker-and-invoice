@@ -71,6 +71,16 @@
 
   <script>
     setTimeout(function() {
+      var status = document.getElementById('splashStatusText');
+      if (status) status.textContent = 'Syncing Cloud Vault...';
+    }, 700);
+
+    setTimeout(function() {
+      var status = document.getElementById('splashStatusText');
+      if (status) status.textContent = 'Ready!';
+    }, 1700);
+
+    setTimeout(function() {
       var splash = document.getElementById('splashScreen');
       if (splash) {
         splash.style.opacity = '0';
