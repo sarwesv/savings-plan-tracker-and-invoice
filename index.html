@@ -24,17 +24,17 @@
     import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     window.FirebaseSDK = {
-      firebaseApp,
-      firebaseAuth,
-      firebaseDb,
+      initializeApp,
+      getAuth,
+      getFirestore,
       signInWithPopup,
+      signInWithRedirect,
       GoogleAuthProvider,
       OAuthProvider,
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
       signOut,
       onAuthStateChanged,
-      getFirestore,
       collection,
       addDoc,
       onSnapshot,
@@ -68,6 +68,17 @@
       </div>
     </div>
   </div>
+
+  <script>
+    setTimeout(function() {
+      var splash = document.getElementById('splashScreen');
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
+        setTimeout(function() { splash.style.display = 'none'; }, 400);
+      }
+    }, 2200);
+  </script>
 
   <!-- Disclaimer Banner -->
   <div class="disclaimer-banner">
