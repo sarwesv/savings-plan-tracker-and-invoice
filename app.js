@@ -855,10 +855,6 @@
             console.error('Apple Sign In Error:', err);
             showToast(`Apple Sign In failed: ${err.message}`, 'danger');
           }
-        }
-      });
-    }
-    }
     // Mobile Bottom Navigation Bar Handler
     document.querySelectorAll('.mobile-nav-item').forEach(btn => {
       btn.addEventListener('click', (e) => {

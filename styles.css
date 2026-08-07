@@ -921,7 +921,7 @@ header {
   position: fixed;
   inset: 0;
   background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #0b1329 60%, #020617 100%);
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -932,7 +932,9 @@ header {
 .splash-overlay.hidden {
   display: none !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none !important;
+  z-index: -99999 !important;
 }
 
 .splash-content {
