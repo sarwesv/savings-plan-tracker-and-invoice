@@ -944,11 +944,9 @@
         snapshot.forEach((docSnap) => {
           liveRequests.push({ id: docSnap.id, ...docSnap.data() });
         });
-        if (liveRequests.length > 0) {
-          State.requests = liveRequests;
+        State.requests = liveRequests;
           State.saveRequests();
           renderApp();
-        }
       });
     } catch (e) {
       console.log('Firestore requests snapshot listener note:', e);
