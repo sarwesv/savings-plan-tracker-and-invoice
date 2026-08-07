@@ -8,9 +8,7 @@
       "googleSignIn": {
         "oAuthBrandDisplayName": "SaveNest App",
         "supportEmail": "mogalt@gmail.com"
-      },
-      "microsoftSignIn": true,
-      "appleSignIn": true
+      }
     },
     "authorizedDomains": [
       "localhost",
