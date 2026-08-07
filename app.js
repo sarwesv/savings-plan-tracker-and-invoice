@@ -755,7 +755,9 @@
 
     document.getElementById('replyRequestId').value = reqId;
     document.getElementById('replyDetailsBox').innerHTML = `
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Requested by ${req.requesterEmail}</div>
+      <div style="font-size: 0.88rem; font-weight: 600; margin-bottom: 0.3rem;">${formatCurrency(req.amount)} requested</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.2rem;"><strong>From:</strong> ${req.requesterEmail}</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted);"><strong>Reason:</strong> ${req.reason}</div>
     `;
     openModal('replyRequestModal');
   }
@@ -1536,39 +1538,24 @@
       splashEl.style.pointerEvents = 'none';
     }
 
-    // Unconditional safety fallback timer (3.2 seconds max)
-    setTimeout(hideSplash, 3200);
+    // Safety fallback
+    setTimeout(hideSplash, 900);
 
     if (window.gsap) {
       try {
         const tl = gsap.timeline();
 
-        // Entrance Animations (0.7s)
-        tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.7, ease: 'back.out(1.8)' })
-          .from('#splashTitle', { y: 20, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.3')
-          .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.35, ease: 'power2.out' }, '-=0.2')
-          
-          // Stage 1 Loading: Engine Initialization
-          .to('#splashProgressBar', { width: '40%', duration: 0.85, ease: 'power1.out', onComplete: () => {
-              if (statusEl) statusEl.textContent = 'Syncing Cloud Vault...';
-          }})
-          // Stage 2 Loading: Syncing Cloud Vault
-          .to('#splashProgressBar', { width: '80%', duration: 0.95, ease: 'power2.inOut', onComplete: () => {
-              if (statusEl) statusEl.textContent = 'Preparing Workspace...';
-          }})
-          // Stage 3 Loading: Complete
-          .to('#splashProgressBar', { width: '100%', duration: 0.5, ease: 'power1.in', onComplete: () => {
+        tl.from('#splashIcon', { scale: 0, opacity: 0, duration: 0.25, ease: 'back.out(1.8)' })
+          .from('#splashTitle', { y: 10, opacity: 0, duration: 0.15, ease: 'power2.out' }, '-=0.1')
+          .to('#splashProgressBar', { width: '100%', duration: 0.2, ease: 'power1.out', onComplete: () => {
               if (statusEl) statusEl.textContent = 'Ready!';
           }})
-          
-          // Fade Out & Scale Entrance to Main App (0.5s)
-          .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: hideSplash }, '+=0.2');
+          .to(splashEl, { opacity: 0, duration: 0.2, ease: 'power2.inOut', onComplete: hideSplash }, '+=0.05');
       } catch (e) {
-        console.error('GSAP splash animation error:', e);
-        setTimeout(hideSplash, 1500);
+        setTimeout(hideSplash, 700);
       }
     } else {
-      setTimeout(hideSplash, 2500);
+      setTimeout(hideSplash, 700);
     }
   }
 

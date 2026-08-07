@@ -74,23 +74,13 @@
 
   <script>
     setTimeout(function() {
-      var status = document.getElementById('splashStatusText');
-      if (status) status.textContent = 'Syncing Cloud Vault...';
-    }, 700);
-
-    setTimeout(function() {
-      var status = document.getElementById('splashStatusText');
-      if (status) status.textContent = 'Ready!';
-    }, 1700);
-
-    setTimeout(function() {
       var splash = document.getElementById('splashScreen');
       if (splash) {
         splash.style.opacity = '0';
         splash.style.pointerEvents = 'none';
-        setTimeout(function() { splash.style.display = 'none'; }, 400);
+        setTimeout(function() { splash.style.display = 'none'; }, 200);
       }
-    }, 2200);
+    }, 700);
   </script>
 
   <!-- Disclaimer Banner -->
