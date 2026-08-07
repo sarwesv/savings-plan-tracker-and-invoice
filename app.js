@@ -757,6 +757,7 @@
     document.getElementById('replyDetailsBox').innerHTML = `
       <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Requested by ${req.requesterEmail}</div>
     `;
+    openModal('replyRequestModal');
   }
 
   function renderAnalyticsTab() {
