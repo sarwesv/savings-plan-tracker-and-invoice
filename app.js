@@ -818,7 +818,11 @@
             renderApp();
           } catch (err) {
             console.error('Microsoft Sign In Error:', err);
-            showToast(`Microsoft Sign In failed: ${err.message}`, 'danger');
+            if (err.code === 'auth/operation-not-allowed') {
+              showToast('Microsoft Sign-In requires Client Secret setup in Firebase Console. Please use Google or Email Sign In!', 'danger');
+            } else if (err.code !== 'auth/popup-closed-by-user') {
+              showToast(`Microsoft Sign In: ${err.message}`, 'danger');
+            }
           }
         }
       });
@@ -853,7 +857,11 @@
             renderApp();
           } catch (err) {
             console.error('Apple Sign In Error:', err);
-            showToast(`Apple Sign In failed: ${err.message}`, 'danger');
+            if (err.code === 'auth/operation-not-allowed') {
+              showToast('Apple Sign-In requires Developer Services setup in Firebase Console. Please use Google or Email Sign In!', 'danger');
+            } else if (err.code !== 'auth/popup-closed-by-user') {
+              showToast(`Apple Sign In: ${err.message}`, 'danger');
+            }
           }
         }
       });
