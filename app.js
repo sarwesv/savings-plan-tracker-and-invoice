@@ -210,10 +210,26 @@
   };
 
   // --------------------------------------------------------------------------
-  // UI Helpers & Formatting
+  // UI Helpers & Formatting (Currency Selection Engine)
   // --------------------------------------------------------------------------
+  const CURRENCY_MAP = {
+    USD: { symbol: '$', code: 'USD' },
+    EUR: { symbol: '€', code: 'EUR' },
+    GBP: { symbol: '£', code: 'GBP' },
+    CAD: { symbol: '$', code: 'CAD' },
+    AUD: { symbol: '$', code: 'AUD' },
+    INR: { symbol: '₹', code: 'INR' }
+  };
+
+  function getCurrencySymbol() {
+    const cur = localStorage.getItem('savenest_currency') || 'USD';
+    return CURRENCY_MAP[cur]?.symbol || '$';
+  }
+
   function formatCurrency(num) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num || 0);
+    const symbol = getCurrencySymbol();
+    const formattedVal = Number(num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return `${symbol}${formattedVal}`;
   }
 
   function formatDate(isoStr) {
@@ -248,7 +264,7 @@
     if (window.gsap) {
       const content = modalEl.querySelector('.modal-content');
       if (content) {
-        gsap.fromTo(content, { scale: 0.82, opacity: 0, y: 15 }, { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: 'back.out(1.5)' });
+        gsap.fromTo(content, { scale: 0.9, opacity: 0, y: 15 }, { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: 'back.out(1.5)' });
       }
     }
   }
@@ -256,15 +272,6 @@
   function closeModal(modalId) {
     const modalEl = document.getElementById(modalId);
     if (!modalEl) return;
-    if (window.gsap) {
-      const content = modalEl.querySelector('.modal-content');
-      if (content) {
-        gsap.to(content, { scale: 0.9, opacity: 0, duration: 0.2, ease: 'power2.in', onComplete: () => {
-          modalEl.classList.add('hidden');
-        }});
-        return;
-      }
-    }
     modalEl.classList.add('hidden');
   }
 
@@ -297,6 +304,7 @@
     renderTransactionsTab();
     renderRequestTabOptions();
     renderInboxTab();
+    renderAnalyticsTab();
   }
 
   function renderStats() {
@@ -307,20 +315,22 @@
     document.getElementById('statTotalSaved').textContent = formatCurrency(totalSaved);
     document.getElementById('statPlanCount').textContent = `Across ${plans.length} savings plan${plans.length === 1 ? '' : 's'}`;
 
-    // Inbox stats
-    const incomingPending = State.requests.filter(r => r.recipientEmail.toLowerCase() === userEmail.toLowerCase() && r.status === 'pending');
+    // Inbox stats & Unread Badge
+    const incomingPending = State.requests.filter(r => r.recipientEmail && r.recipientEmail.toLowerCase() === userEmail.toLowerCase() && r.status === 'pending');
     document.getElementById('statPendingCount').textContent = incomingPending.length;
 
     const inboxBadge = document.getElementById('inboxBadge');
-    if (incomingPending.length > 0) {
-      inboxBadge.textContent = incomingPending.length;
-      inboxBadge.classList.remove('hidden');
-    } else {
-      inboxBadge.classList.add('hidden');
+    if (inboxBadge) {
+      if (incomingPending.length > 0) {
+        inboxBadge.textContent = incomingPending.length;
+        inboxBadge.classList.remove('hidden');
+      } else {
+        inboxBadge.classList.add('hidden');
+      }
     }
 
     // Outbox stats
-    const outgoing = State.requests.filter(r => r.requesterEmail.toLowerCase() === userEmail.toLowerCase());
+    const outgoing = State.requests.filter(r => r.requesterEmail && r.requesterEmail.toLowerCase() === userEmail.toLowerCase());
     const outgoingAccepted = outgoing.filter(r => r.status === 'accepted').length;
     document.getElementById('statOutboxAccepted').textContent = `${outgoingAccepted} Accepted`;
     document.getElementById('statOutboxTotal').textContent = `${outgoing.length} total request${outgoing.length === 1 ? '' : 's'} sent`;
@@ -635,12 +645,109 @@
 
     document.getElementById('replyRequestId').value = reqId;
     document.getElementById('replyDetailsBox').innerHTML = `
-      <div style="font-weight: 700; color: var(--accent-amber); font-size: 1.1rem; margin-bottom: 0.2rem;">${formatCurrency(req.amount)}</div>
-      <div><strong>Reason:</strong> ${req.reason}</div>
       <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Requested by ${req.requesterEmail}</div>
     `;
-    document.getElementById('replyMessage').value = '';
-    openModal('replyRequestModal');
+  }
+
+  function renderAnalyticsTab() {
+    if (!State.currentUser) return;
+    const userEmail = State.currentUser.email;
+    const plans = State.getUserPlans(userEmail);
+
+    const totalTarget = plans.reduce((acc, p) => acc + (p.targetAmount || 0), 0);
+    const totalSaved = plans.reduce((acc, p) => acc + (p.currentSaved || 0), 0);
+    const remaining = Math.max(0, totalTarget - totalSaved);
+    const overallPct = totalTarget > 0 ? Math.min(100, Math.round((totalSaved / totalTarget) * 100)) : 0;
+    const completedCount = plans.filter(p => (p.currentSaved || 0) >= (p.targetAmount || 1)).length;
+
+    const pctEl = document.getElementById('analyticsCompletionPct');
+    const barEl = document.getElementById('analyticsPortfolioBar');
+    const remEl = document.getElementById('analyticsRemainingAmount');
+    const compEl = document.getElementById('analyticsCompletedCount');
+
+    if (pctEl) pctEl.textContent = `${overallPct}%`;
+    if (barEl) {
+      if (window.gsap) {
+        gsap.to(barEl, { width: `${overallPct}%`, duration: 0.8, ease: 'power2.out' });
+      } else {
+        barEl.style.width = `${overallPct}%`;
+      }
+    }
+    if (remEl) remEl.textContent = formatCurrency(remaining);
+    if (compEl) compEl.textContent = completedCount;
+
+    // Render Category Breakdown
+    const catContainer = document.getElementById('categoryBreakdownContainer');
+    if (catContainer) {
+      if (plans.length === 0) {
+        catContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No active savings plans found. Create a plan to view category analytics.</p>`;
+      } else {
+        const catMap = {};
+        plans.forEach(p => {
+          const icon = p.categoryIcon || '🎯';
+          if (!catMap[icon]) catMap[icon] = 0;
+          catMap[icon] += (p.currentSaved || 0);
+        });
+
+        catContainer.innerHTML = '';
+        Object.keys(catMap).forEach(icon => {
+          const amount = catMap[icon];
+          const pct = totalSaved > 0 ? Math.round((amount / totalSaved) * 100) : 0;
+
+          const item = document.createElement('div');
+          item.style.marginBottom = '0.5rem';
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.3rem;">
+              <span style="font-weight: 600;">${icon} Category Allocation</span>
+              <span style="font-weight: 700; color: var(--accent-primary);">${formatCurrency(amount)} (${pct}%)</span>
+            </div>
+            <div class="progress-track" style="height: 6px;"><div class="progress-fill" style="width: ${pct}%;"></div></div>
+          `;
+          catContainer.appendChild(item);
+        });
+      }
+    }
+
+    // Render Goal Progress Leaderboard
+    const leadContainer = document.getElementById('analyticsLeaderboardContainer');
+    if (leadContainer) {
+      if (plans.length === 0) {
+        leadContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No active savings goals found.</p>`;
+      } else {
+        const sortedPlans = [...plans].sort((a, b) => {
+          const pctA = a.targetAmount > 0 ? (a.currentSaved / a.targetAmount) : 0;
+          const pctB = b.targetAmount > 0 ? (b.currentSaved / b.targetAmount) : 0;
+          return pctB - pctA;
+        });
+
+        leadContainer.innerHTML = '';
+        sortedPlans.forEach((p, idx) => {
+          const pct = p.targetAmount > 0 ? Math.min(100, Math.round((p.currentSaved / p.targetAmount) * 100)) : 0;
+          const badgeColor = pct >= 100 ? 'var(--accent-amber)' : (idx === 0 ? 'var(--accent-primary)' : 'var(--accent-blue)');
+
+          const card = document.createElement('div');
+          card.style.background = 'rgba(255, 255, 255, 0.03)';
+          card.style.border = '1px solid var(--border-color)';
+          card.style.padding = '0.8rem 1rem';
+          card.style.borderRadius = 'var(--radius-sm)';
+          card.style.display = 'flex';
+          card.style.alignItems = 'center';
+          card.style.justifyContent = 'space-between';
+
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div style="font-weight: 800; font-size: 1rem; color: var(--text-muted);">#${idx + 1}</div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.9rem;">${p.categoryIcon || '🎯'} ${p.title}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${formatCurrency(p.currentSaved)} / ${formatCurrency(p.targetAmount)}</div>
+              </div>
+            </div>
+            <div style="font-weight: 800; font-size: 1.1rem; color: ${badgeColor};">${pct}%</div>
+          `;
+          leadContainer.appendChild(card);
+        });
+      }
+    }
   }
 
   function switchTab(tabName) {
@@ -919,6 +1026,18 @@
     // Theme Manager (Dark Mode vs Light Mode)
     const themeDarkBtn = document.getElementById('themeDarkBtn');
     const themeLightBtn = document.getElementById('themeLightBtn');
+
+    // Currency Selector Handler
+    const currencySelect = document.getElementById('currencySelector');
+    if (currencySelect) {
+      currencySelect.value = localStorage.getItem('savenest_currency') || 'USD';
+      currencySelect.addEventListener('change', (e) => {
+        const newCurrency = e.target.value;
+        localStorage.setItem('savenest_currency', newCurrency);
+        showToast(`Currency updated to ${newCurrency}`);
+        renderApp();
+      });
+    }
 
     function applyTheme(theme) {
       if (theme === 'light') {

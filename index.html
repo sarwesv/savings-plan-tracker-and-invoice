@@ -247,7 +247,12 @@
             <polyline points="22,6 12,13 2,6"/>
           </svg>
           Inbox & Requests
-          <span class="tab-badge hidden" id="inboxBadge">0</span>
+          <span class="tab-badge hidden" id="inboxBadge" style="background: var(--accent-rose); color: #fff; font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 999px; font-weight: 700; margin-left: 0.3rem;">0</span>
+        </button>
+
+        <button class="tab-btn" data-tab="analytics">
+          <span class="material-symbols-rounded" style="font-size: 1.1rem;">analytics</span>
+          Analytics
         </button>
 
         <button class="tab-btn" data-tab="settings">
@@ -432,7 +437,22 @@
             </div>
           </div>
 
-          <!-- Setting 3: Danger Zone -->
+          <!-- Setting 3: Currency Preference -->
+          <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">Currency Symbol & Format</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.8rem;">Select your preferred currency symbol across all plans, transactions, and requests.</p>
+
+            <select id="currencySelector" class="form-control" style="max-width: 320px;">
+              <option value="USD">USD ($) - US Dollar</option>
+              <option value="EUR">EUR (€) - Euro</option>
+              <option value="GBP">GBP (£) - British Pound</option>
+              <option value="CAD">CAD ($) - Canadian Dollar</option>
+              <option value="AUD">AUD ($) - Australian Dollar</option>
+              <option value="INR">INR (₹) - Indian Rupee</option>
+            </select>
+          </div>
+
+          <!-- Setting 4: Danger Zone -->
           <div>
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-rose); margin-bottom: 0.4rem;">Danger Zone</h3>
             <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Permanently erase your account and all associated savings data.</p>
@@ -441,6 +461,62 @@
               <span class="material-symbols-rounded">delete_forever</span>
               <span>Permanently Delete Account</span>
             </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: ANALYTICS & PORTFOLIO BREAKDOWN -->
+      <section id="tab-analytics" class="tab-content hidden">
+        <div class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="font-weight: 800; font-size: 1.4rem;">Savings Analytics & Portfolio Breakdown</h2>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">Real-time portfolio metrics, category allocation, and goal completion progress.</p>
+            </div>
+            <div class="pill-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-primary); border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; padding: 0.4rem 0.85rem; border-radius: var(--radius-full); font-size: 0.8rem; display: flex; align-items: center; gap: 0.35rem;">
+              <span class="material-symbols-rounded" style="font-size: 1rem;">insights</span>
+              <span>Portfolio Analytics Active</span>
+            </div>
+          </div>
+
+          <!-- Top Analytics Stats Cards -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Overall Target Completion</div>
+              <div id="analyticsCompletionPct" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-primary); margin: 0.3rem 0;">0%</div>
+              <div class="progress-track" style="height: 6px; margin-top: 0.5rem;"><div id="analyticsPortfolioBar" class="progress-fill" style="width: 0%;"></div></div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Remaining Goal</div>
+              <div id="analyticsRemainingAmount" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-blue); margin: 0.3rem 0;">$0.00</div>
+              <div style="font-size: 0.76rem; color: var(--text-subtle);">Needed to hit 100% target across all plans</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md);">
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Completed Goals 🎉</div>
+              <div id="analyticsCompletedCount" style="font-size: 2.1rem; font-weight: 800; color: var(--accent-amber); margin: 0.3rem 0;">0</div>
+              <div style="font-size: 0.76rem; color: var(--text-subtle);">Plans that reached 100% goal</div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown Chart & Leaderboard Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
+              <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-rounded" style="color: var(--accent-purple);">pie_chart</span>
+                Category Allocation Breakdown
+              </h3>
+              <div id="categoryBreakdownContainer" style="display: flex; flex-direction: column; gap: 0.85rem;"></div>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md);">
+              <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-rounded" style="color: var(--accent-amber);">leaderboard</span>
+                Goal Completion Leaderboard
+              </h3>
+              <div id="analyticsLeaderboardContainer" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+            </div>
           </div>
         </div>
       </section>
