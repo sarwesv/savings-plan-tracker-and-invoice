@@ -1,0 +1,23 @@
+{
+  "projects": {
+    "default": "savenest-app-2026"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "SaveNest App",
+        "supportEmail": "mogalt@gmail.com"
+      }
+    },
+    "authorizedDomains": [
+      "localhost",
+      "127.0.0.1",
+      "savenest-app-2026.firebaseapp.com",
+      "savenest-app-2026.web.app"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}
