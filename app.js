@@ -1042,6 +1042,15 @@
       const initialSaved = parseFloat(document.getElementById('planInitial').value) || 0;
       const categoryIcon = document.getElementById('planIcon').value;
 
+      if (isNaN(targetAmount) || targetAmount <= 0) {
+        showToast('Please enter a valid target goal amount greater than $0.', 'danger');
+        return;
+      }
+      if (isNaN(initialSaved) || initialSaved < 0) {
+        showToast('Initial saved balance cannot be negative.', 'danger');
+        return;
+      }
+
       const planId = 'plan_' + Date.now();
 
       const newPlan = {
@@ -1082,6 +1091,11 @@
       const amount = parseFloat(document.getElementById('txAmount').value);
       const note = document.getElementById('txNote').value.trim();
 
+      if (isNaN(amount) || amount <= 0) {
+        showToast('Please enter a valid transaction amount greater than $0.', 'danger');
+        return;
+      }
+
       State.addTransaction({
         id: 'tx_' + Date.now(),
         planId,
@@ -1104,6 +1118,11 @@
       const amount = parseFloat(document.getElementById('reqAmount').value);
       const reason = document.getElementById('reqReason').value.trim();
       const linkedPlanId = document.getElementById('reqLinkPlan').value;
+
+      if (isNaN(amount) || amount <= 0) {
+        showToast('Please enter a valid request amount greater than $0.', 'danger');
+        return;
+      }
 
       const recipientLower = recipientEmail.toLowerCase().trim();
 
