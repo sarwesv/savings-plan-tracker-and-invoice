@@ -1063,11 +1063,14 @@
     applyTheme(savedTheme);
 
     // 2. Sign Out
-    document.getElementById('signOutBtn').addEventListener('click', () => {
-      State.clearCurrentUser();
-      showToast('Signed out successfully');
-      renderApp();
-    });
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) {
+      signOutBtn.addEventListener('click', () => {
+        State.clearCurrentUser();
+        showToast('Signed out successfully');
+        renderApp();
+      });
+    }
 
     // 2.5 Delete Account Handler
     function triggerDeleteModalFlow() {
@@ -1117,23 +1120,29 @@
     });
 
     // 4. Modal Open & Close Triggers
-    document.getElementById('openNewPlanModalBtn').addEventListener('click', () => {
-      openModal('createPlanModal');
-    });
-
-    document.getElementById('openLogTxModalBtn').addEventListener('click', () => {
-      const plans = State.getUserPlans(State.currentUser.email);
-      const select = document.getElementById('txPlanId');
-      if (plans.length === 0) {
-        showToast('Please create a savings plan first before logging transactions.', 'danger');
-        return;
-      }
-      select.innerHTML = '';
-      plans.forEach(p => {
-        select.innerHTML += `<option value="${p.id}">${p.categoryIcon || '🎯'} ${p.title} (Current: ${formatCurrency(p.currentSaved)})</option>`;
+    const openNewPlanModalBtn = document.getElementById('openNewPlanModalBtn');
+    if (openNewPlanModalBtn) {
+      openNewPlanModalBtn.addEventListener('click', () => {
+        openModal('createPlanModal');
       });
-      openModal('logTxModal');
-    });
+    }
+
+    const openLogTxModalBtn = document.getElementById('openLogTxModalBtn');
+    if (openLogTxModalBtn) {
+      openLogTxModalBtn.addEventListener('click', () => {
+        const plans = State.getUserPlans(State.currentUser ? State.currentUser.email : '');
+        const select = document.getElementById('txPlanId');
+        if (plans.length === 0) {
+          showToast('Please create a savings plan first before logging transactions.', 'danger');
+          return;
+        }
+        select.innerHTML = '';
+        plans.forEach(p => {
+          select.innerHTML += `<option value="${p.id}">${p.categoryIcon || '🎯'} ${p.title} (Current: ${formatCurrency(p.currentSaved)})</option>`;
+        });
+        openModal('logTxModal');
+      });
+    }
 
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1143,152 +1152,167 @@
     });
 
     // 5. Create Plan Form
-    document.getElementById('createPlanForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const title = document.getElementById('planTitle').value.trim();
-      const reason = document.getElementById('planReason').value.trim();
-      const targetAmount = parseFloat(document.getElementById('planTarget').value);
-      const initialSaved = parseFloat(document.getElementById('planInitial').value) || 0;
-      const categoryIcon = document.getElementById('planIcon').value;
+    const createPlanForm = document.getElementById('createPlanForm');
+    if (createPlanForm) {
+      createPlanForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('planTitle').value.trim();
+        const reason = document.getElementById('planReason').value.trim();
+        const targetAmount = parseFloat(document.getElementById('planTarget').value);
+        const initialSaved = parseFloat(document.getElementById('planInitial').value) || 0;
+        const categoryIcon = document.getElementById('planIcon').value;
 
-      if (isNaN(targetAmount) || targetAmount <= 0) {
-        showToast('Please enter a valid target goal amount greater than $0.', 'danger');
-        return;
-      }
-      if (isNaN(initialSaved) || initialSaved < 0) {
-        showToast('Initial saved balance cannot be negative.', 'danger');
-        return;
-      }
+        if (isNaN(targetAmount) || targetAmount <= 0) {
+          showToast('Please enter a valid target goal amount greater than $0.', 'danger');
+          return;
+        }
+        if (isNaN(initialSaved) || initialSaved < 0) {
+          showToast('Initial saved balance cannot be negative.', 'danger');
+          return;
+        }
 
-      const planId = 'plan_' + Date.now();
+        const planId = 'plan_' + Date.now();
 
-      const newPlan = {
-        id: planId,
-        title,
-        reason,
-        targetAmount,
-        currentSaved: initialSaved,
-        categoryIcon,
-        createdAt: new Date().toISOString()
-      };
+        const newPlan = {
+          id: planId,
+          title,
+          reason,
+          targetAmount,
+          currentSaved: initialSaved,
+          categoryIcon,
+          createdAt: new Date().toISOString()
+        };
 
-      State.addPlan(newPlan);
+        State.addPlan(newPlan);
 
-      // If initial saved money > 0, log it in transaction history
-      if (initialSaved > 0) {
-        State.addTransaction({
-          id: 'tx_' + Date.now(),
-          planId: planId,
-          type: 'deposit',
-          amount: initialSaved,
-          note: 'Initial saved balance upon creation',
-          date: new Date().toISOString()
-        });
-      }
+        // If initial saved money > 0, log it in transaction history
+        if (initialSaved > 0) {
+          State.addTransaction({
+            id: 'tx_' + Date.now(),
+            planId: planId,
+            type: 'deposit',
+            amount: initialSaved,
+            note: 'Initial saved balance upon creation',
+            date: new Date().toISOString()
+          });
+        }
 
-      showToast(`Created savings plan "${title}"!`);
-      closeModal('createPlanModal');
-      document.getElementById('createPlanForm').reset();
-      renderApp();
-    });
+        showToast(`Created savings plan "${title}"!`);
+        closeModal('createPlanModal');
+        createPlanForm.reset();
+        renderApp();
+      });
+    }
 
     // 6. Log Transaction Form
-    document.getElementById('logTxForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const planId = document.getElementById('txPlanId').value;
-      const type = document.getElementById('txType').value;
-      const amount = parseFloat(document.getElementById('txAmount').value);
-      const note = document.getElementById('txNote').value.trim();
+    const logTxForm = document.getElementById('logTxForm');
+    if (logTxForm) {
+      logTxForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const planId = document.getElementById('txPlanId').value;
+        const type = document.getElementById('txType').value;
+        const amount = parseFloat(document.getElementById('txAmount').value);
+        const note = document.getElementById('txNote').value.trim();
 
-      if (isNaN(amount) || amount <= 0) {
-        showToast('Please enter a valid transaction amount greater than $0.', 'danger');
-        return;
-      }
+        if (isNaN(amount) || amount <= 0) {
+          showToast('Please enter a valid transaction amount greater than $0.', 'danger');
+          return;
+        }
 
-      State.addTransaction({
-        id: 'tx_' + Date.now(),
-        planId,
-        type,
-        amount,
-        note,
-        date: new Date().toISOString()
+        State.addTransaction({
+          id: 'tx_' + Date.now(),
+          planId,
+          type,
+          amount,
+          note,
+          date: new Date().toISOString()
+        });
+
+        showToast(`Recorded ${type} of ${formatCurrency(amount)}`);
+        closeModal('logTxModal');
+        logTxForm.reset();
+        renderApp();
       });
-
-      showToast(`Recorded ${type} of ${formatCurrency(amount)}`);
-      closeModal('logTxModal');
-      document.getElementById('logTxForm').reset();
-      renderApp();
-    });
+    }
 
     // 7. Request Money Form
-    document.getElementById('requestMoneyForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const recipientEmail = document.getElementById('reqRecipientEmail').value.trim();
-      const amount = parseFloat(document.getElementById('reqAmount').value);
-      const reason = document.getElementById('reqReason').value.trim();
-      const linkedPlanId = document.getElementById('reqLinkPlan').value;
+    const requestMoneyForm = document.getElementById('requestMoneyForm');
+    if (requestMoneyForm) {
+      requestMoneyForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const recipientEmail = document.getElementById('reqRecipientEmail').value.trim();
+        const amount = parseFloat(document.getElementById('reqAmount').value);
+        const reason = document.getElementById('reqReason').value.trim();
+        const linkedPlanId = document.getElementById('reqLinkPlan').value;
 
-      if (isNaN(amount) || amount <= 0) {
-        showToast('Please enter a valid request amount greater than $0.', 'danger');
-        return;
-      }
+        if (isNaN(amount) || amount <= 0) {
+          showToast('Please enter a valid request amount greater than $0.', 'danger');
+          return;
+        }
 
-      const recipientLower = recipientEmail.toLowerCase().trim();
+        const recipientLower = recipientEmail.toLowerCase().trim();
 
-      if (recipientLower === State.currentUser.email.toLowerCase()) {
-        showToast('You cannot send a payment request to your own account email.', 'danger');
-        return;
-      }
+        if (State.currentUser && recipientLower === State.currentUser.email.toLowerCase()) {
+          showToast('You cannot send a payment request to your own account email.', 'danger');
+          return;
+        }
 
-      // RULE: Target recipient MUST be a registered user on SaveNest
-      const isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
-      if (!isRegistered) {
-        showToast(`Cannot send request. No registered user account found for "${recipientEmail}". They must register an account on SaveNest first.`, 'danger');
-        return;
-      }
+        // RULE: Target recipient MUST be a registered user on SaveNest
+        const isRegistered = State.users.some(u => u.email.toLowerCase() === recipientLower);
+        if (!isRegistered) {
+          showToast(`Cannot send request. No registered user account found for "${recipientEmail}". They must register an account on SaveNest first.`, 'danger');
+          return;
+        }
 
-      // Add to recent recipients list
-      addRecentRecipient(recipientLower);
+        // Add to recent recipients list
+        addRecentRecipient(recipientLower);
 
-      const newRequest = {
-        id: 'req_' + Date.now(),
-        requesterEmail: State.currentUser.email,
-        recipientEmail: recipientEmail,
-        amount,
-        reason,
-        linkedPlanId,
-        status: 'pending',
-        recipientMessage: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+        const newRequest = {
+          id: 'req_' + Date.now(),
+          requesterEmail: State.currentUser ? State.currentUser.email : '',
+          recipientEmail: recipientEmail,
+          amount,
+          reason,
+          linkedPlanId,
+          status: 'pending',
+          recipientMessage: '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
 
-      State.addRequest(newRequest);
-      showToast(`Payment request for ${formatCurrency(amount)} sent to ${recipientEmail}!`);
-      document.getElementById('requestMoneyForm').reset();
-      
-      switchTab('inbox');
-      renderApp();
-    });
+        State.addRequest(newRequest);
+        showToast(`Payment request for ${formatCurrency(amount)} sent to ${recipientEmail}!`);
+        requestMoneyForm.reset();
+        
+        switchTab('inbox');
+        renderApp();
+      });
+    }
 
     // 9. Respond Accept / Decline buttons
-    document.getElementById('acceptRequestBtn').addEventListener('click', () => {
-      const reqId = document.getElementById('replyRequestId').value;
-      const message = document.getElementById('replyMessage').value.trim() || 'Accepted';
-      State.updateRequestStatus(reqId, 'accepted', message);
-      showToast('Accepted payment request!');
-      closeModal('replyRequestModal');
-      renderApp();
-    });
+    const acceptRequestBtn = document.getElementById('acceptRequestBtn');
+    if (acceptRequestBtn) {
+      acceptRequestBtn.addEventListener('click', () => {
+        const reqId = document.getElementById('replyRequestId').value;
+        const message = document.getElementById('replyMessage').value.trim() || 'Accepted';
+        State.updateRequestStatus(reqId, 'accepted', message);
+        showToast('Accepted payment request!');
+        closeModal('replyRequestModal');
+        renderApp();
+      });
+    }
 
-    document.getElementById('declineRequestBtn').addEventListener('click', () => {
-      const reqId = document.getElementById('replyRequestId').value;
-      const message = document.getElementById('replyMessage').value.trim() || 'Declined';
-      State.updateRequestStatus(reqId, 'declined', message);
-      showToast('Declined request.');
-      closeModal('replyRequestModal');
-      renderApp();
-    });
+    const declineRequestBtn = document.getElementById('declineRequestBtn');
+    if (declineRequestBtn) {
+      declineRequestBtn.addEventListener('click', () => {
+        const reqId = document.getElementById('replyRequestId').value;
+        const message = document.getElementById('replyMessage').value.trim() || 'Declined';
+        State.updateRequestStatus(reqId, 'declined', message);
+        showToast('Declined request.');
+        closeModal('replyRequestModal');
+        renderApp();
+      });
+    }
   }
 
   // --------------------------------------------------------------------------
