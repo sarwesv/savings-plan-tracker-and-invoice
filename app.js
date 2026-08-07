@@ -89,19 +89,49 @@
       if (!email) return;
       const targetEmail = email.toLowerCase();
       
+      // 1. Remove from user accounts registry
       this.users = this.users.filter(u => u.email.toLowerCase() !== targetEmail);
       this.saveUsers();
 
-      delete this.plans[targetEmail];
-      delete this.transactions[targetEmail];
+      // 2. Remove all plans matching email case-insensitively
+      Object.keys(this.plans).forEach(key => {
+        if (key.toLowerCase() === targetEmail) {
+          delete this.plans[key];
+        }
+      });
       this.savePlans();
+
+      // 3. Remove all transactions matching email case-insensitively
+      Object.keys(this.transactions).forEach(key => {
+        if (key.toLowerCase() === targetEmail) {
+          delete this.transactions[key];
+        }
+      });
       this.saveTransactions();
 
+      // 4. Remove all outgoing/incoming requests
       this.requests = this.requests.filter(r => 
-        r.requesterEmail.toLowerCase() !== targetEmail && 
-        r.recipientEmail.toLowerCase() !== targetEmail
+        (r.requesterEmail && r.requesterEmail.toLowerCase() !== targetEmail) && 
+        (r.recipientEmail && r.recipientEmail.toLowerCase() !== targetEmail)
       );
       this.saveRequests();
+
+      // 5. Cloud Firestore Purge for deleted account
+      if (firebaseDb && window.FirebaseSDK) {
+        try {
+          window.FirebaseSDK.getDocs(window.FirebaseSDK.collection(firebaseDb, "requests")).then(snapshot => {
+            snapshot.forEach(docSnap => {
+              const data = docSnap.data();
+              if ((data.requesterEmail && data.requesterEmail.toLowerCase() === targetEmail) ||
+                  (data.recipientEmail && data.recipientEmail.toLowerCase() === targetEmail)) {
+                window.FirebaseSDK.deleteDoc(window.FirebaseSDK.doc(firebaseDb, "requests", docSnap.id));
+              }
+            });
+          });
+        } catch (e) {
+          console.log('Firestore purge note:', e);
+        }
+      }
 
       if (this.currentUser && this.currentUser.email.toLowerCase() === targetEmail) {
         this.clearCurrentUser();
@@ -109,35 +139,44 @@
     },
 
     getUserPlans(email) {
-      return this.plans[email] || [];
+      if (!email) return [];
+      const targetEmail = email.toLowerCase();
+      const key = Object.keys(this.plans).find(k => k.toLowerCase() === targetEmail);
+      return key ? (this.plans[key] || []) : [];
     },
 
     getUserTransactions(email) {
-      return this.transactions[email] || [];
+      if (!email) return [];
+      const targetEmail = email.toLowerCase();
+      const key = Object.keys(this.transactions).find(k => k.toLowerCase() === targetEmail);
+      return key ? (this.transactions[key] || []) : [];
     },
 
     addPlan(plan) {
-      const email = this.currentUser.email;
-      if (!this.plans[email]) this.plans[email] = [];
-      this.plans[email].unshift(plan);
+      if (!this.currentUser) return;
+      const key = this.currentUser.email.toLowerCase();
+      if (!this.plans[key]) this.plans[key] = [];
+      this.plans[key].unshift(plan);
       this.savePlans();
     },
 
     deletePlan(planId) {
-      const email = this.currentUser.email;
-      if (this.plans[email]) {
-        this.plans[email] = this.plans[email].filter(p => p.id !== planId);
+      if (!this.currentUser) return;
+      const key = this.currentUser.email.toLowerCase();
+      if (this.plans[key]) {
+        this.plans[key] = this.plans[key].filter(p => p.id !== planId);
         this.savePlans();
       }
     },
 
     addTransaction(tx) {
-      const email = this.currentUser.email;
-      if (!this.transactions[email]) this.transactions[email] = [];
-      this.transactions[email].unshift(tx);
+      if (!this.currentUser) return;
+      const key = this.currentUser.email.toLowerCase();
+      if (!this.transactions[key]) this.transactions[key] = [];
+      this.transactions[key].unshift(tx);
 
       // Update plan's saved total
-      const userPlans = this.getUserPlans(email);
+      const userPlans = this.getUserPlans(key);
       const plan = userPlans.find(p => p.id === tx.planId);
       if (plan) {
         if (tx.type === 'deposit') {
