@@ -1245,10 +1245,14 @@
   // --------------------------------------------------------------------------
   // GSAP Animated Splash Screen Controller (~3-Second Realistic Loading)
   // --------------------------------------------------------------------------
+  let splashInitialized = false;
+
   function initSplashScreen() {
+    if (splashInitialized) return;
     const splashEl = document.getElementById('splashScreen');
     const statusEl = document.getElementById('splashStatusText');
     if (!splashEl) return;
+    splashInitialized = true;
 
     if (window.gsap) {
       const tl = gsap.timeline();
@@ -1273,11 +1277,11 @@
         
         // Fade Out & Scale Entrance to Main App (0.5s)
         .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: () => {
-            splashEl.classList.add('hidden');
+            splashEl.style.display = 'none';
         }}, '+=0.2');
     } else {
       setTimeout(() => {
-        splashEl.classList.add('hidden');
+        splashEl.style.display = 'none';
       }, 3000);
     }
   }
@@ -1292,5 +1296,9 @@
     setupEventListeners();
     renderApp();
   });
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initSplashScreen, 10);
+  }
 
 })();
