@@ -858,26 +858,6 @@
         }
       });
     }
-
-    // 0.3 Guest Sign In Handler
-    const guestBtn = document.getElementById('guestSignInBtn');
-    if (guestBtn) {
-      guestBtn.addEventListener('click', () => {
-        const guestEmail = `guest_${Math.floor(1000 + Math.random() * 9000)}@savenest.app`;
-        const guestName = `Guest ${guestEmail.split('_')[1].split('@')[0]}`;
-        const guestUser = {
-          email: guestEmail,
-          name: guestName,
-          avatar: '👤',
-          provider: 'guest'
-        };
-        State.users.push(guestUser);
-        State.saveUsers();
-        State.setCurrentUser(guestUser);
-        showToast(`Signed in as Guest! (${guestUser.name})`);
-        renderApp();
-      });
-    }
     }
     // Mobile Bottom Navigation Bar Handler
     document.querySelectorAll('.mobile-nav-item').forEach(btn => {
