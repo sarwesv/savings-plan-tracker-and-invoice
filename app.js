@@ -1183,25 +1183,42 @@
   }
 
   // --------------------------------------------------------------------------
-  // GSAP Animated Splash Screen Controller
+  // GSAP Animated Splash Screen Controller (~3-Second Realistic Loading)
   // --------------------------------------------------------------------------
   function initSplashScreen() {
     const splashEl = document.getElementById('splashScreen');
+    const statusEl = document.getElementById('splashStatusText');
     if (!splashEl) return;
 
     if (window.gsap) {
       const tl = gsap.timeline();
-      tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.85, ease: 'back.out(1.8)' })
-        .from('#splashTitle', { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
-        .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
-        .to('#splashProgressBar', { width: '100%', duration: 1.1, ease: 'power2.inOut' }, '-=0.2')
+
+      // Entrance Animations (0.7s)
+      tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.7, ease: 'back.out(1.8)' })
+        .from('#splashTitle', { y: 20, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.3')
+        .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.35, ease: 'power2.out' }, '-=0.2')
+        
+        // Stage 1 Loading: Engine Initialization
+        .to('#splashProgressBar', { width: '40%', duration: 0.85, ease: 'power1.out', onComplete: () => {
+            if (statusEl) statusEl.textContent = 'Syncing Cloud Vault...';
+        }})
+        // Stage 2 Loading: Syncing Cloud Vault
+        .to('#splashProgressBar', { width: '80%', duration: 0.95, ease: 'power2.inOut', onComplete: () => {
+            if (statusEl) statusEl.textContent = 'Preparing Workspace...';
+        }})
+        // Stage 3 Loading: Complete
+        .to('#splashProgressBar', { width: '100%', duration: 0.5, ease: 'power1.in', onComplete: () => {
+            if (statusEl) statusEl.textContent = 'Ready!';
+        }})
+        
+        // Fade Out & Scale Entrance to Main App (0.5s)
         .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: () => {
             splashEl.classList.add('hidden');
-        }}, '+=0.15');
+        }}, '+=0.2');
     } else {
       setTimeout(() => {
         splashEl.classList.add('hidden');
-      }, 1500);
+      }, 3000);
     }
   }
 
