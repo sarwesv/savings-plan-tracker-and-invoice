@@ -779,25 +779,105 @@
             }
 
             State.setCurrentUser(existingUser);
-            showToast(`Signed in as ${existingUser.name}!`);
+            showToast(`Signed in with Google as ${existingUser.name}`);
             renderApp();
-          } catch (error) {
-            console.error('Firebase Google Sign-In error:', error);
-            if (error.code === 'auth/popup-blocked' || error.code === 'auth/unauthorized-domain' || error.message.includes('popup')) {
-              try {
-                showToast('Redirecting to Google Sign-In...');
-                await window.FirebaseSDK.signInWithRedirect(firebaseAuth, googleAuthProvider);
-              } catch (redirectErr) {
-                showToast(`Google Sign-In: ${redirectErr.message}`, 'danger');
-              }
-            } else if (error.code !== 'auth/popup-closed-by-user') {
-              showToast(`Google Sign-In: ${error.message}`, 'danger');
-            }
+          } catch (err) {
+            console.error('Google Sign In Error:', err);
+            showToast(`Google Sign In failed: ${err.message}`, 'danger');
           }
-        } else {
-          showToast('Loading Sign-In... Please try again.', 'danger');
         }
       });
+    }
+
+    // 0.1 Microsoft Sign In Handler
+    const microsoftBtn = document.getElementById('microsoftSignInBtn');
+    if (microsoftBtn) {
+      microsoftBtn.addEventListener('click', async () => {
+        if (firebaseAuth && window.FirebaseSDK && window.FirebaseSDK.OAuthProvider) {
+          try {
+            showToast('Opening Microsoft Sign-In...');
+            const provider = new window.FirebaseSDK.OAuthProvider('microsoft.com');
+            const result = await window.FirebaseSDK.signInWithPopup(firebaseAuth, provider);
+            const email = result.user.email || `${result.user.uid}@microsoft.com`;
+            const name = result.user.displayName || email.split('@')[0];
+            const msUser = {
+              uid: result.user.uid,
+              email: email,
+              name: name,
+              avatar: 'MS',
+              provider: 'microsoft'
+            };
+            let existingUser = State.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!existingUser) {
+              existingUser = msUser;
+              State.users.push(existingUser);
+              State.saveUsers();
+            }
+            State.setCurrentUser(existingUser);
+            showToast(`Signed in with Microsoft as ${existingUser.name}`);
+            renderApp();
+          } catch (err) {
+            console.error('Microsoft Sign In Error:', err);
+            showToast(`Microsoft Sign In failed: ${err.message}`, 'danger');
+          }
+        }
+      });
+    }
+
+    // 0.2 Apple Sign In Handler
+    const appleBtn = document.getElementById('appleSignInBtn');
+    if (appleBtn) {
+      appleBtn.addEventListener('click', async () => {
+        if (firebaseAuth && window.FirebaseSDK && window.FirebaseSDK.OAuthProvider) {
+          try {
+            showToast('Opening Apple Sign-In...');
+            const provider = new window.FirebaseSDK.OAuthProvider('apple.com');
+            const result = await window.FirebaseSDK.signInWithPopup(firebaseAuth, provider);
+            const email = result.user.email || `${result.user.uid}@icloud.com`;
+            const name = result.user.displayName || email.split('@')[0];
+            const appleUser = {
+              uid: result.user.uid,
+              email: email,
+              name: name,
+              avatar: '🍎',
+              provider: 'apple'
+            };
+            let existingUser = State.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!existingUser) {
+              existingUser = appleUser;
+              State.users.push(existingUser);
+              State.saveUsers();
+            }
+            State.setCurrentUser(existingUser);
+            showToast(`Signed in with Apple as ${existingUser.name}`);
+            renderApp();
+          } catch (err) {
+            console.error('Apple Sign In Error:', err);
+            showToast(`Apple Sign In failed: ${err.message}`, 'danger');
+          }
+        }
+      });
+    }
+
+    // 0.3 Guest Sign In Handler
+    const guestBtn = document.getElementById('guestSignInBtn');
+    if (guestBtn) {
+      guestBtn.addEventListener('click', () => {
+        const guestEmail = `guest_${Math.floor(1000 + Math.random() * 9000)}@savenest.app`;
+        const guestName = `Guest ${guestEmail.split('_')[1].split('@')[0]}`;
+        const guestUser = {
+          email: guestEmail,
+          name: guestName,
+          avatar: '👤',
+          provider: 'guest'
+        };
+        State.users.push(guestUser);
+        State.saveUsers();
+        State.setCurrentUser(guestUser);
+        showToast(`Signed in as Guest! (${guestUser.name})`);
+        renderApp();
+      });
+    }
     }
     // Mobile Bottom Navigation Bar Handler
     document.querySelectorAll('.mobile-nav-item').forEach(btn => {
