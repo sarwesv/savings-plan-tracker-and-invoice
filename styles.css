@@ -915,3 +915,70 @@ header {
     padding-bottom: 75px;
   }
 }
+
+/* Animated Splash Screen */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #0b1329 60%, #020617 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 360px;
+  padding: 2rem;
+}
+
+.splash-icon-wrapper {
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px var(--accent-glow), var(--shadow-lg);
+  margin-bottom: 1.25rem;
+}
+
+.splash-brand-icon {
+  width: 46px;
+  height: 46px;
+  color: #ffffff;
+}
+
+.splash-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.splash-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.splash-progress-track {
+  width: 180px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.splash-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
+  border-radius: 999px;
+}

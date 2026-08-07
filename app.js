@@ -1183,9 +1183,33 @@
   }
 
   // --------------------------------------------------------------------------
+  // GSAP Animated Splash Screen Controller
+  // --------------------------------------------------------------------------
+  function initSplashScreen() {
+    const splashEl = document.getElementById('splashScreen');
+    if (!splashEl) return;
+
+    if (window.gsap) {
+      const tl = gsap.timeline();
+      tl.from('#splashIcon', { scale: 0, opacity: 0, rotation: -15, duration: 0.85, ease: 'back.out(1.8)' })
+        .from('#splashTitle', { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+        .from('#splashSubtitle', { y: 15, opacity: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+        .to('#splashProgressBar', { width: '100%', duration: 1.1, ease: 'power2.inOut' }, '-=0.2')
+        .to(splashEl, { opacity: 0, scale: 1.05, duration: 0.5, ease: 'power2.inOut', onComplete: () => {
+            splashEl.classList.add('hidden');
+        }}, '+=0.15');
+    } else {
+      setTimeout(() => {
+        splashEl.classList.add('hidden');
+      }, 1500);
+    }
+  }
+
+  // --------------------------------------------------------------------------
   // App Bootstrapper
   // --------------------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
+    initSplashScreen();
     State.init();
     initFirebaseAuth();
     setupEventListeners();
