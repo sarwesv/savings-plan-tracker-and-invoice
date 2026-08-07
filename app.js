@@ -131,9 +131,33 @@
       );
       this.saveRequests();
 
-      // 5. Cloud Firestore Purge for deleted account
+      // 5. Complete Cloud Firestore Purge for deleted account (Users, Plans, Transactions, Requests)
       if (firebaseDb && window.FirebaseSDK) {
         try {
+          // Delete User document
+          window.FirebaseSDK.deleteDoc(window.FirebaseSDK.doc(firebaseDb, "users", targetEmail));
+
+          // Delete Plans collection documents
+          window.FirebaseSDK.getDocs(window.FirebaseSDK.collection(firebaseDb, "plans")).then(snapshot => {
+            snapshot.forEach(docSnap => {
+              const d = docSnap.data();
+              if (d.userEmail && d.userEmail.toLowerCase() === targetEmail) {
+                window.FirebaseSDK.deleteDoc(window.FirebaseSDK.doc(firebaseDb, "plans", docSnap.id));
+              }
+            });
+          });
+
+          // Delete Transactions collection documents
+          window.FirebaseSDK.getDocs(window.FirebaseSDK.collection(firebaseDb, "transactions")).then(snapshot => {
+            snapshot.forEach(docSnap => {
+              const d = docSnap.data();
+              if (d.userEmail && d.userEmail.toLowerCase() === targetEmail) {
+                window.FirebaseSDK.deleteDoc(window.FirebaseSDK.doc(firebaseDb, "transactions", docSnap.id));
+              }
+            });
+          });
+
+          // Delete Requests collection documents
           window.FirebaseSDK.getDocs(window.FirebaseSDK.collection(firebaseDb, "requests")).then(snapshot => {
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
@@ -144,7 +168,7 @@
             });
           });
         } catch (e) {
-          console.log('Firestore purge note:', e);
+          console.log('Firestore complete purge note:', e);
         }
       }
 
@@ -170,9 +194,18 @@
     addPlan(plan) {
       if (!this.currentUser) return;
       const key = this.currentUser.email.toLowerCase();
+      plan.userEmail = key;
       if (!this.plans[key]) this.plans[key] = [];
       this.plans[key].unshift(plan);
       this.savePlans();
+
+      if (firebaseDb && window.FirebaseSDK) {
+        try {
+          window.FirebaseSDK.setDoc(window.FirebaseSDK.doc(firebaseDb, "plans", plan.id), plan);
+        } catch (e) {
+          console.log('Firestore plan write error:', e);
+        }
+      }
     },
 
     deletePlan(planId) {
@@ -182,11 +215,20 @@
         this.plans[key] = this.plans[key].filter(p => p.id !== planId);
         this.savePlans();
       }
+
+      if (firebaseDb && window.FirebaseSDK) {
+        try {
+          window.FirebaseSDK.deleteDoc(window.FirebaseSDK.doc(firebaseDb, "plans", planId));
+        } catch (e) {
+          console.log('Firestore plan delete error:', e);
+        }
+      }
     },
 
     addTransaction(tx) {
       if (!this.currentUser) return;
       const key = this.currentUser.email.toLowerCase();
+      tx.userEmail = key;
       if (!this.transactions[key]) this.transactions[key] = [];
       this.transactions[key].unshift(tx);
 
@@ -200,8 +242,22 @@
           plan.currentSaved = Math.max(0, plan.currentSaved - Number(tx.amount));
         }
         this.savePlans();
+
+        if (firebaseDb && window.FirebaseSDK) {
+          try {
+            window.FirebaseSDK.setDoc(window.FirebaseSDK.doc(firebaseDb, "plans", plan.id), plan, { merge: true });
+          } catch (e) {}
+        }
       }
       this.saveTransactions();
+
+      if (firebaseDb && window.FirebaseSDK) {
+        try {
+          window.FirebaseSDK.setDoc(window.FirebaseSDK.doc(firebaseDb, "transactions", tx.id), tx);
+        } catch (e) {
+          console.log('Firestore tx write error:', e);
+        }
+      }
     },
 
     addRequest(req) {
@@ -920,6 +976,28 @@
       });
     } catch (e) {
       console.log('Firestore users snapshot listener note:', e);
+    }
+
+    // 3. Real-Time Plans Sync for signed-in user
+    if (State.currentUser) {
+      try {
+        const currentEmail = State.currentUser.email.toLowerCase();
+        const plansRef = window.FirebaseSDK.collection(firebaseDb, "plans");
+        window.FirebaseSDK.onSnapshot(plansRef, (snapshot) => {
+          const cloudUserPlans = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.userEmail && data.userEmail.toLowerCase() === currentEmail) {
+              cloudUserPlans.push({ id: docSnap.id, ...data });
+            }
+          });
+          State.plans[currentEmail] = cloudUserPlans;
+          State.savePlans();
+          renderApp();
+        });
+      } catch (e) {
+        console.log('Firestore plans snapshot listener note:', e);
+      }
     }
   }
 
