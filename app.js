@@ -1498,10 +1498,18 @@
     if (acceptRequestBtn) {
       acceptRequestBtn.addEventListener('click', () => {
         const reqId = document.getElementById('replyRequestId').value;
-        const message = document.getElementById('replyMessage').value.trim() || 'Accepted';
+        const rawMessage = document.getElementById('replyMessage').value.trim();
+        const paymentMethod = document.getElementById('replyPaymentMethod').value;
+        
+        let message = rawMessage || 'Accepted & Paid';
+        if (paymentMethod) {
+          message = `[${paymentMethod}] ` + message;
+        }
+
         State.updateRequestStatus(reqId, 'accepted', message);
-        showToast('Accepted payment request!');
+        showToast('Marked payment request as Paid!');
         closeModal('replyRequestModal');
+        document.getElementById('replyPaymentMethod').value = ''; // reset
         renderApp();
       });
     }

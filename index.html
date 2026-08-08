@@ -633,6 +633,19 @@
           <textarea id="replyMessage" class="form-control" rows="3" placeholder="Type your message response here..."></textarea>
         </div>
 
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" for="replyPaymentMethod">Settlement Method</label>
+          <select id="replyPaymentMethod" class="form-control">
+            <option value="">Paid internally (Default)</option>
+            <option value="Cash">Paid in Cash</option>
+            <option value="Venmo">Paid via Venmo</option>
+            <option value="Zelle">Paid via Zelle</option>
+            <option value="PayPal">Paid via PayPal</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Other">Other External Method</option>
+          </select>
+        </div>
+
         <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
           Choose your decision:
         </p>
@@ -642,7 +655,7 @@
             ❌ No (Decline)
           </button>
           <button type="button" id="acceptRequestBtn" class="btn btn-primary" style="flex: 1;">
-            ✅ Yes (Accept & Confirm)
+            ✅ Mark as Paid
           </button>
         </div>
       </form>
