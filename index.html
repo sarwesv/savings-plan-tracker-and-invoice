@@ -445,7 +445,19 @@
             </select>
           </div>
 
-          <!-- Setting 4: Danger Zone -->
+          <!-- Setting 4: Personal Payment Link -->
+          <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">Personal Payment Link</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.8rem;">Provide a public payment link (e.g. PayPal.me, Venmo, Stripe) so others can pay your requests with one tap.</p>
+
+            <div style="display: flex; gap: 0.5rem; max-width: 450px;">
+              <input type="url" id="userPaymentLinkInput" class="form-control" placeholder="https://paypal.me/yourusername" style="flex: 1;">
+              <button type="button" id="savePaymentLinkBtn" class="btn btn-primary">Save</button>
+            </div>
+            <div id="paymentLinkStatus" style="font-size: 0.75rem; color: var(--accent-primary); margin-top: 0.4rem; display: none;">Link saved successfully!</div>
+          </div>
+
+          <!-- Setting 5: Danger Zone -->
           <div>
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-rose); margin-bottom: 0.4rem;">Danger Zone</h3>
             <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Permanently erase your account and all associated savings data.</p>

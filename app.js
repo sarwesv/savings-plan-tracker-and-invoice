@@ -406,6 +406,12 @@
     document.getElementById('headerUserEmail').textContent = State.currentUser.email;
     document.getElementById('headerAvatar').textContent = State.currentUser.avatar || State.currentUser.name.charAt(0);
 
+    // Hydrate Settings
+    const paymentLinkInput = document.getElementById('userPaymentLinkInput');
+    if (paymentLinkInput) {
+      paymentLinkInput.value = State.currentUser.paymentLink || '';
+    }
+
     // Stats overview
     renderStats();
 
@@ -681,11 +687,22 @@
             </div>
           ` : ''}
 
-          ${req.status === 'pending' ? `
-            <button class="btn btn-primary open-reply-modal-btn" data-reqid="${req.id}">
-              Respond / Reply to Request
-            </button>
-          ` : ''}
+          ${req.status === 'pending' ? (() => {
+            const requester = State.users.find(u => u.email.toLowerCase() === req.requesterEmail.toLowerCase());
+            const payLink = requester && requester.paymentLink ? requester.paymentLink : null;
+            return `
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn btn-primary open-reply-modal-btn" data-reqid="${req.id}" style="flex: 1;">
+                  Respond to Request
+                </button>
+                ${payLink ? `
+                  <a href="${payLink}" target="_blank" class="btn btn-primary" style="background: var(--accent-amber); border-color: var(--accent-amber); color: #000; text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.85rem;">
+                    Pay Now ↗
+                  </a>
+                ` : ''}
+              </div>
+            `;
+          })() : ''}
         `;
 
         incomingContainer.appendChild(card);
@@ -1209,6 +1226,40 @@
         localStorage.setItem('savenest_currency', newCurrency);
         showToast(`Currency updated to ${newCurrency}`);
         renderApp();
+      });
+    }
+
+    // Payment Link Setting Handler
+    const savePaymentLinkBtn = document.getElementById('savePaymentLinkBtn');
+    if (savePaymentLinkBtn) {
+      savePaymentLinkBtn.addEventListener('click', async () => {
+        if (!State.currentUser) return;
+        const linkInput = document.getElementById('userPaymentLinkInput').value.trim();
+        const statusText = document.getElementById('paymentLinkStatus');
+        
+        State.currentUser.paymentLink = linkInput;
+        // Update locally
+        const uIdx = State.users.findIndex(u => u.email.toLowerCase() === State.currentUser.email.toLowerCase());
+        if (uIdx !== -1) {
+          State.users[uIdx].paymentLink = linkInput;
+          State.saveUsers();
+        }
+
+        // Sync to Firestore
+        if (firebaseDb && window.FirebaseSDK) {
+          try {
+            await window.FirebaseSDK.setDoc(
+              window.FirebaseSDK.doc(firebaseDb, "users", State.currentUser.email.toLowerCase()),
+              { paymentLink: linkInput },
+              { merge: true }
+            );
+            statusText.style.display = 'block';
+            setTimeout(() => statusText.style.display = 'none', 3000);
+          } catch (e) {
+            console.log('Payment link save error:', e);
+            showToast('Failed to save to cloud.', 'danger');
+          }
+        }
       });
     }
 
