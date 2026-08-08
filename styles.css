@@ -1035,7 +1035,7 @@ header {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-blue));
   border-radius: 999px;
-  animation: splashProgressFill 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: splashProgressFill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes splashProgressFill {

@@ -1539,23 +1539,24 @@
     }
 
     // Safety fallback
-    setTimeout(hideSplash, 900);
+    setTimeout(hideSplash, 1700);
 
     if (window.gsap) {
       try {
         const tl = gsap.timeline();
 
-        tl.from('#splashIcon', { scale: 0, opacity: 0, duration: 0.25, ease: 'back.out(1.8)' })
-          .from('#splashTitle', { y: 10, opacity: 0, duration: 0.15, ease: 'power2.out' }, '-=0.1')
-          .to('#splashProgressBar', { width: '100%', duration: 0.2, ease: 'power1.out', onComplete: () => {
+        tl.from('#splashIcon', { scale: 0, opacity: 0, duration: 0.3, ease: 'back.out(1.8)' })
+          .from('#splashTitle', { y: 10, opacity: 0, duration: 0.2, ease: 'power2.out' }, '-=0.1')
+          .from('#splashSubtitle', { y: 8, opacity: 0, duration: 0.2, ease: 'power2.out' }, '-=0.1')
+          .to('#splashProgressBar', { width: '100%', duration: 0.6, ease: 'power1.inOut', onComplete: () => {
               if (statusEl) statusEl.textContent = 'Ready!';
           }})
-          .to(splashEl, { opacity: 0, duration: 0.2, ease: 'power2.inOut', onComplete: hideSplash }, '+=0.05');
+          .to(splashEl, { opacity: 0, duration: 0.25, ease: 'power2.inOut', onComplete: hideSplash }, '+=0.1');
       } catch (e) {
-        setTimeout(hideSplash, 700);
+        setTimeout(hideSplash, 1500);
       }
     } else {
-      setTimeout(hideSplash, 700);
+      setTimeout(hideSplash, 1500);
     }
   }
 
